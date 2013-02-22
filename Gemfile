@@ -12,6 +12,8 @@ group :test, :development do
   gem "rspec-rails", "~> 2.0"
 end
 
+gem 'factory_girl_rails'
+
 gem 'jquery-rails'
 gem "haml", ">= 3.1.6"
 gem "haml-rails", ">= 0.3.4", :group => :development
