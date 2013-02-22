@@ -6,6 +6,11 @@
 %p
   %b Domains:
   = @app.domains
+%p
+  %b Authorized Keys:
+  %ul
+    - for key in @app.keys
+      %li= key.name
 
 = link_to 'Edit', edit_app_path(@app)
 \|

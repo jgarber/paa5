@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @key.name
+%p
+  %b Body:
+  = @key.body
+
+= link_to 'Edit', edit_key_path(@key)
+\|
+= link_to 'Back', keys_path

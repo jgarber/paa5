@@ -7,10 +7,21 @@
           %li= msg
 
   .field
-    = f.label :name
-    = f.text_field :name
+    - if @app.new_record?
+      = f.label :name
+      = f.text_field :name
+    - else
+      %b Name:
+      = @app.name
   .field
     = f.label :domains, "Domains (one per line)"
     = f.text_area :domains, size: '80x5'
+
+  .field
+    = label_tag "Keys"
+    - for key in Key.find(:all)
+      %div
+        = check_box_tag "app[key_ids][]", key.id, @app.keys.include?(key)
+        = key.name
   .actions
     = f.submit 'Save'

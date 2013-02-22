@@ -11,11 +11,26 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130222143446) do
+ActiveRecord::Schema.define(:version => 20130222151728) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
     t.text     "domains"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "apps_keys", :id => false, :force => true do |t|
+    t.integer "app_id"
+    t.integer "key_id"
+  end
+
+  add_index "apps_keys", ["app_id", "key_id"], :name => "index_apps_keys_on_app_id_and_key_id"
+  add_index "apps_keys", ["key_id", "app_id"], :name => "index_apps_keys_on_key_id_and_app_id"
+
+  create_table "keys", :force => true do |t|
+    t.string   "name"
+    t.text     "body"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end

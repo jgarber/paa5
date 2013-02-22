@@ -1,6 +1,6 @@
 defaults: &defaults
-  repos_path: tmp/repositories
-  authkeys_file: tmp/authorized_keys
+  repos_path: ./tmp/repositories
+  authkeys_file: ./tmp/authorized_keys
 
 development:
   <<: *defaults

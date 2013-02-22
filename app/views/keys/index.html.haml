@@ -1,0 +1,21 @@
+%h1 Listing keys
+
+%table
+  %tr
+    %th Name
+    %th Body
+    %th
+    %th
+    %th
+
+  - @keys.each do |key|
+    %tr
+      %td= key.name
+      %td= key.body
+      %td= link_to 'Show', key
+      %td= link_to 'Edit', edit_key_path(key)
+      %td= link_to 'Destroy', key, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Key', new_key_path
