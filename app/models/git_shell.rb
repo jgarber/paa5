@@ -1,4 +1,5 @@
 class GitShell
+  ALLOWED_COMMANDS = %w(git-upload-pack git-receive-pack git-upload-archive)
   attr_reader :config, :name
 
   def self.update_app_keys(keys)
@@ -7,6 +8,23 @@ class GitShell
     end
     IO.write(config['authkeys_file'], lines.join("\n"))
   end
+
+  def self.receive_push(io=$stdout)
+    key_name = ARGV.shift
+    original_command = ENV['SSH_ORIGINAL_COMMAND']
+    command, repo = original_command.split(' ')
+    key = Key.find_by_name(key_name)
+    app = App.find_by_name(repo)
+
+    if key.nil?
+      io.puts "Key #{key_name} not found."
+    elsif app.nil?
+      io.puts "App #{repo} not found."
+    elsif key.in?(app.keys)
+      new(repo).receive_push(command, io)
+    else
+      io.puts "You do not have access to app #{repo}."
+    end
   end
 
   def self.config
@@ -22,8 +40,12 @@ class GitShell
     create_repository
   end
 
-  def receive_push
-
+  def receive_push(command, io=$stdout)
+    if command.in?(ALLOWED_COMMANDS)
+      system("#{command} #{repo_path}")
+    else
+      io.puts "You do not have permission to #{command}."
+    end
   end
 
   protected
@@ -39,7 +61,7 @@ class GitShell
   end
 
   def repo_path
-    File.join(config['repos_path'], name)
+    File.join(config['repos_path'], name + '.git')
   end
 
   def checkout_path
