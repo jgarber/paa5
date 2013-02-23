@@ -11,7 +11,7 @@
   - @keys.each do |key|
     %tr
       %td= key.name
-      %td= key.body
+      %td= key.body.truncate(100)
       %td= link_to 'Show', key
       %td= link_to 'Edit', edit_key_path(key)
       %td= link_to 'Destroy', key, :method => :delete, :data => { :confirm => 'Are you sure?' }

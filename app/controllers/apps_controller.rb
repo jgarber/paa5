@@ -25,6 +25,7 @@ class AppsController < ApplicationController
   # GET /apps/new.json
   def new
     @app = App.new
+    @keys = Key.all
 
     respond_to do |format|
       format.html # new.html.erb
@@ -35,6 +36,7 @@ class AppsController < ApplicationController
   # GET /apps/1/edit
   def edit
     @app = App.find(params[:id])
+    @keys = Key.all
   end
 
   # POST /apps
@@ -47,6 +49,7 @@ class AppsController < ApplicationController
         format.html { redirect_to @app, notice: 'App was successfully created.' }
         format.json { render json: @app, status: :created, location: @app }
       else
+        @keys = Key.all
         format.html { render action: "new" }
         format.json { render json: @app.errors, status: :unprocessable_entity }
       end

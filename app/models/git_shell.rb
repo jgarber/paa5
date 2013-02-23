@@ -2,10 +2,11 @@ class GitShell
   attr_reader :config, :name
 
   def self.update_app_keys(keys)
-    keys.map do |key|
-      "command=\"#{Rails.root}/bin/git-shell\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{key}"
+    lines = keys.map do |key|
+      "command=\"#{Rails.root}/bin/git-shell '#{key.name}'\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{key.body}"
     end
-    IO.write(config['authkeys_file'], keys.join("\n"))
+    IO.write(config['authkeys_file'], lines.join("\n"))
+  end
   end
 
   def self.config

@@ -19,9 +19,12 @@
 
   .field
     = label_tag "Keys"
-    - for key in Key.find(:all)
+    - for key in @keys
       %div
         = check_box_tag "app[key_ids][]", key.id, @app.keys.include?(key)
         = key.name
+    - if @keys.empty?
+      %p You don't have any keys yet. You'll need one to push to this repository.
+      %p= link_to "Add keys.", new_key_path
   .actions
     = f.submit 'Save'
