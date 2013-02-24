@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+#^syntax detection
+
+site 'http://community.opscode.com/api/v1'
+
+cookbook 'apt'
+cookbook 'build-essential'
+cookbook 'git'
+cookbook 'ruby_build'
+cookbook 'rbenv',       :git => 'https://github.com/fnichol/chef-rbenv'
+
+cookbook 'database'
+cookbook 'postgresql'
+cookbook 'initdb', :git => 'git://github.com/xforty/chef-initdb.git'
+cookbook 'nodejs'
+cookbook 'nginx'
+cookbook 'bluepill'

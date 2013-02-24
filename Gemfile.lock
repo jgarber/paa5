@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/puma/puma.git
+  revision: 2e2440024623e91bc4f3eb9052b27164627a60f3
+  specs:
+    puma (2.0.0.b6)
+      rack (>= 1.1, < 2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -76,8 +83,6 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.3.1)
-    puma (1.6.3)
-      rack (~> 1.2)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -147,7 +152,7 @@ DEPENDENCIES
   jquery-rails
   pg
   pry
-  puma
+  puma (~> 2.0.0.b6)!
   rails (~> 3.2.12)
   rspec-rails (~> 2.0)
   sass-rails (~> 3.2.3)

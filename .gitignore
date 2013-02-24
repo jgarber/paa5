@@ -6,7 +6,7 @@
 # The original version of this file is found here:
 # https://github.com/RailsApps/rails3-application-templates/raw/master/files/gitignore.txt
 #
-# Corrections? Improvements? Create a GitHub issue: 
+# Corrections? Improvements? Create a GitHub issue:
 # http://github.com/RailsApps/rails3-application-templates/issues
 #----------------------------------------------------------------------------
 
@@ -37,6 +37,7 @@ db/*.sqlite3
 /doc/features.html
 /doc/specs.html
 /public/cache
+/public/assets
 /public/stylesheets/compiled
 /public/system/*
 /spec/tmp/*
@@ -74,3 +75,7 @@ pickle-email-*.html
 
 # vim artifacts
 **.swp
+
+# vagrant
+.vagrant
+cookbooks/
