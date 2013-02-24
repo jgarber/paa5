@@ -21,11 +21,14 @@ include_recipe "ruby_build"
 
 include_recipe "rbenv::system"
 include_recipe "rbenv::vagrant"
-include_recipe "nginx"
 
 rbenv_global node['paa5']['ruby_version']
 rbenv_gem "bundler"
 rbenv_gem "rake"
+rbenv_gem "bluepill"
+
+node['nginx']['init_style'] = "bluepill"
+include_recipe "nginx::source"
 
 postgresql_connection_info = {:host => "localhost",
                               :port => node['postgresql']['config']['port'],
@@ -63,8 +66,6 @@ rbenv_script "run-paa5-admin" do
     bundle exec puma -b unix:/tmp/puma.paa5.sock --pidfile tmp/pids/server.pid -e $RAILS_ENV -d
   EOD
 end
-
-node['nginx']['init_style'] = "bluepill"
 
 template "/etc/nginx/sites-enabled/default" do
   owner "root"
