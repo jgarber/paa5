@@ -1,9 +1,16 @@
 require 'spec_helper'
 
 describe App do
-  let(:app) { create(:app) }
+  describe "create app" do
+    it "creates the repository" do
+      GitShell.any_instance.should_receive(:create_app)
+      create(:app)
+    end
+  end
 
   context "new App" do
+    let(:app) { create(:app) }
+
     describe :name do
       it "is required" do
         build(:app, name: '').should_not be_valid

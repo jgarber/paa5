@@ -85,9 +85,9 @@ describe GitShell do
     end
 
     context "app directory exists" do
-      it "should raise an error" do
+      it "should not raise an error" do
         FileUtils.mkdir_p(app_path(name))
-        expect { GitShell.new(name).create_app }.to raise_error("App directory already exists.")
+        expect { GitShell.new(name).create_app }.to_not raise_error
       end
     end
 

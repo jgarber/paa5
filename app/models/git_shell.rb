@@ -53,7 +53,6 @@ class GitShell
   end
 
   def create_app_directory
-    raise "App directory already exists." if File.exists?(app_path)
     FileUtils.mkdir_p(app_path, mode: 0770)
     Dir.chdir(app_path) do
       FileUtils.mkdir_p(%w(logs build releases))
