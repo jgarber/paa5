@@ -1,12 +1,12 @@
 class GitShell
   ALLOWED_COMMANDS = %w(git-upload-pack git-receive-pack git-upload-archive)
-  attr_reader :config, :name
+  attr_reader :name
 
   def self.update_app_keys(keys)
     lines = keys.map do |key|
       "command=\"#{Rails.root}/bin/git-shell '#{key.name}'\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{key.body}"
     end
-    IO.write(config['authkeys_file'], lines.join("\n"))
+    IO.write(APP_CONFIG['authkeys_file'], lines.join("\n"))
   end
 
   def self.receive_push(io=$stdout)
@@ -27,17 +27,13 @@ class GitShell
     end
   end
 
-  def self.config
-    YAML.load_file(File.join(Rails.root, 'config', 'git.yml'))[Rails.env]
-  end
-
   def initialize(app_name)
-    @config = self.class.config
     @name = app_name
   end
 
   def create_app
     create_repository
+    create_app_directory
   end
 
   def receive_push(command, io=$stdout)
@@ -56,15 +52,16 @@ class GitShell
     system(cmd)
   end
 
-  def create_working_copy
-    FileUtils.mkdir_p(checkout_path, mode: 0770)
+  def create_app_directory
+    raise "App directory already exists." if File.exists?(app_path)
+    FileUtils.mkdir_p(app_path, mode: 0770)
   end
 
   def repo_path
-    File.join(config['repos_path'], name + '.git')
+    File.join(APP_CONFIG['repos_path'], name + '.git')
   end
 
-  def checkout_path
-    "/srv/#{name}"
+  def app_path
+    File.join(APP_CONFIG['apps_directory'], name)
   end
 end

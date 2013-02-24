@@ -1,6 +1,7 @@
 defaults: &defaults
   repos_path: ./tmp/repositories
   authkeys_file: ./tmp/authorized_keys
+  apps_directory: ./tmp/apps
 
 development:
   <<: *defaults
@@ -11,4 +12,5 @@ test:
 production:
   repos_path: /home/git/repositories
   authkeys_file: /home/git/.ssh/authorized_keys
+  apps_directory: /srv
 

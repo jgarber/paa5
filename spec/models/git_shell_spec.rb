@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GitShell do
   describe ".update_app_keys" do
     it "should write all keys to the authkeys file" do
-      file = GitShell.config['authkeys_file']
+      file = APP_CONFIG['authkeys_file']
       FileUtils.rm_f(file)
       keys = [create(:key), create(:key, name: "key 2")]
       GitShell.update_app_keys(keys)
@@ -67,13 +67,29 @@ describe GitShell do
   end
 
   describe "#create_app" do
+    let(:name) { 'my_app' }
+
+    before do
+      FileUtils.rm_rf(app_path(name))
+    end
+
     it "should create the bare repository" do
-      git_shell = GitShell.new('foo')
-      git_shell.should_receive(:system).with("cd ./tmp/repositories/foo.git && git init --bare")
+      git_shell = GitShell.new(name)
+      git_shell.should_receive(:system).with("cd ./tmp/repositories/#{name}.git && git init --bare")
       git_shell.create_app
     end
 
-    it "should create the working copy"
+    it "should create the working copy" do
+      GitShell.new(name).create_app
+      expect { File.exists? app_path(name) }.to be_true
+    end
+
+    context "app directory exists" do
+      it "should raise an error" do
+        FileUtils.mkdir_p(app_path(name))
+        expect { GitShell.new(name).create_app }.to raise_error("App directory already exists.")
+      end
+    end
 
     it "should create an nginx config"
   end
@@ -84,6 +100,10 @@ describe GitShell do
 
   def key_name(name)
     ARGV[0] = name
+  end
+
+  def app_path(name)
+    File.join(APP_CONFIG['apps_directory'], name)
   end
 
   def should_be_rejected_with(message)
