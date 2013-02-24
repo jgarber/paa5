@@ -18,6 +18,9 @@ node['rbenv']['rubies'] = [ node['paa5']['ruby_version'] ]
 include_recipe "apt"
 package "build-essential"
 include_recipe "ruby_build"
+include_recipe "nodejs"
+include_recipe "database::postgresql"
+include_recipe "postgresql::server"
 
 include_recipe "rbenv::system"
 include_recipe "rbenv::vagrant"

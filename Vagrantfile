@@ -47,10 +47,6 @@ Vagrant::Config.run do |config|
 
     #chef.log_level = :debug
 
-    chef.add_recipe "database::postgresql"
-    chef.add_recipe "postgresql::server"
-    chef.add_recipe "nginx"
-    chef.add_recipe "nodejs"
     chef.add_recipe "paa5"
 
     chef.json = {
