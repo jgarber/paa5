@@ -6,6 +6,17 @@ describe App do
       GitShell.any_instance.should_receive(:create_app)
       create(:app)
     end
+
+    it "creates the nginx site config" do
+      nginx_dir = APP_CONFIG['nginx_config_directory']
+      site_available = File.join(nginx_dir, 'sites-available', 'foo')
+      site_enabled = File.join(nginx_dir, 'sites-enabled', 'foo')
+      [site_available, site_enabled].each {|f| FileUtils.rm_rf(f) }
+
+      create(:app, name: 'foo')
+      File.exist?(site_available).should be_true
+      File.identical?(site_available, site_enabled).should be_true
+    end
   end
 
   context "new App" do
