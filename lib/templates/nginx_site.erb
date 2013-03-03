@@ -8,7 +8,7 @@ server {
   listen 80<%= ' default' if default_site %>;
   <% if nginx_server_names.any? %>server_name <%= nginx_server_names.join(' ') %>;<% end %>
 
-  root <%= apps_directory %>/current/public;
+  root <%= apps_directory %>/<%= name %>/current/public;
 
   gzip on;
   gzip_types text/plain text/xml application/xml application/xml+rss

@@ -2,6 +2,7 @@ defaults: &defaults
   repos_path: ./tmp/repositories
   authkeys_file: ./tmp/authorized_keys
   apps_directory: ./tmp/apps
+  nginx_config_directory: ./tmp/nginx
 
 development:
   <<: *defaults
@@ -13,4 +14,5 @@ production:
   repos_path: /home/git/repositories
   authkeys_file: /home/git/.ssh/authorized_keys
   apps_directory: /srv
+  nginx_config_directory: /etc/nginx
 

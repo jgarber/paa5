@@ -62,17 +62,52 @@ task :deploy => :environment do
     invoke :'bundle:install'
     invoke :'rails:db_migrate'
     invoke :'rails:assets_precompile'
+    invoke :'foreman:export'
 
     to :launch do
-      #queue 'touch tmp/restart.txt'
+      queue 'sudo bluepill restart nginx'
+      invoke 'foreman:restart' # FIXME: needs some logic for when not already started
     end
   end
 end
 
-# For help in making your deploy script, see the Mina documentation:
-#
-#  - http://nadarei.co/mina
-#  - http://nadarei.co/mina/tasks
-#  - http://nadarei.co/mina/settings
-#  - http://nadarei.co/mina/helpers
+set_default :foreman_app,  lambda { application }
+set_default :foreman_user, lambda { user }
+set_default :foreman_log,  lambda { "#{deploy_to!}/#{shared_path}/log" }
+
+namespace :foreman do
+  desc 'Export the Procfile to Bluepill scripts'
+  task :export do
+    export_cmd = "sudo #{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log}"
+
+    queue %{
+      echo "-----> Exporting foreman procfile for #{foreman_app}"
+      #{echo_cmd %[cd #{deploy_to!}/#{current_path!} ; #{export_cmd}]}
+    }
+  end
+
+  desc "Start the application services"
+  task :start do
+    queue %{
+      echo "-----> Starting #{foreman_app} services"
+      #{echo_cmd %[sudo "bluepill start #{foreman_app}"]}
+    }
+  end
+
+  desc "Stop the application services"
+  task :stop do
+    queue %{
+      echo "-----> Stopping #{foreman_app} services"
+      #{echo_cmd %[sudo "bluepill stop #{foreman_app}"]}
+    }
+  end
+
+  desc "Restart the application services"
+  task :restart do
+    queue %{
+      echo "-----> Restarting #{foreman_app} services"
+      #{echo_cmd %[sudo bluepill restart #{foreman_app}]}
+    }
+  end
+end
 
