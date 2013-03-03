@@ -79,3 +79,5 @@ pickle-email-*.html
 # vagrant
 .vagrant
 cookbooks/
+
+/shared/

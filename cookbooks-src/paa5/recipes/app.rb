@@ -37,10 +37,10 @@ rbenv_script "run-paa5-admin" do
   cwd app_dir
   environment 'RAILS_ENV' => 'production'
 
+    #bundle install
+    #bundle exec rake db:migrate
+    #bundle exec rake assets:precompile
   code <<-EOD
-    bundle install
-    bundle exec rake db:migrate
-    bundle exec rake assets:precompile
     rm -f tmp/pids/server.pid
     bundle exec puma -b unix:/tmp/puma.paa5.sock --pidfile tmp/pids/server.pid -e $RAILS_ENV -d
   EOD
