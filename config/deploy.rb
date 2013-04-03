@@ -26,6 +26,11 @@ set :shared_paths, ['config/database.yml', 'config/config.yml', 'log']
 #   set :user, 'foobar'    # Username in the server to SSH to.
 #   set :port, '30000'     # SSH port number.
 
+set_default :foreman_app,  lambda { deploy_to.split('/').last }
+set_default :foreman_user, lambda { user }
+set_default :foreman_log,  lambda { "#{deploy_to!}/#{shared_path}/log" }
+set_default :bluepill_bin, "`readlink -f /etc/init.d/nginx`"
+
 # This task is the environment that is loaded for most commands, such as
 # `mina deploy` or `mina rake`.
 task :environment do
@@ -67,17 +72,13 @@ task :deploy => :environment do
     invoke :'foreman:export'
 
     to :launch do
-      queue "sudo bluepill load /etc/bluepill/#{foreman_app}.pill"
-      # TODO: link the app.pill to an init.d script like chef does for nginx
-      queue 'sudo bluepill nginx restart'
+      queue "sudo #{bluepill_bin} load /etc/bluepill/#{foreman_app}.pill"
+      queue "sudo ln -sf #{bluepill_bin} /etc/init.d/#{foreman_app}"
+      queue "sudo #{bluepill_bin} nginx restart"
       invoke 'foreman:restart'
     end
   end
 end
-
-set_default :foreman_app,  lambda { deploy_to.split('/').last }
-set_default :foreman_user, lambda { user }
-set_default :foreman_log,  lambda { "#{deploy_to!}/#{shared_path}/log" }
 
 namespace :foreman do
   desc 'Export the .env file'
@@ -99,7 +100,7 @@ namespace :foreman do
   task :start do
     queue %{
       echo "-----> Starting #{foreman_app} services"
-      #{echo_cmd %[sudo bluepill #{foreman_app} start]}
+      #{echo_cmd %[sudo #{bluepill_bin} #{foreman_app} start]}
     }
   end
 
@@ -107,7 +108,7 @@ namespace :foreman do
   task :stop do
     queue %{
       echo "-----> Stopping #{foreman_app} services"
-      #{echo_cmd %[sudo bluepill #{foreman_app} stop]}
+      #{echo_cmd %[sudo #{bluepill_bin} #{foreman_app} stop]}
     }
   end
 
@@ -116,9 +117,9 @@ namespace :foreman do
     queue %{
       echo "-----> Restarting #{foreman_app} services"
       # No-ops if not started
-      #{echo_cmd %[sudo bluepill #{foreman_app} restart]}
+      #{echo_cmd %[sudo #{bluepill_bin} #{foreman_app} restart]}
       # No-ops if already running
-      #{echo_cmd %[sudo bluepill #{foreman_app} start]}
+      #{echo_cmd %[sudo #{bluepill_bin} #{foreman_app} start]}
     }
   end
 end
