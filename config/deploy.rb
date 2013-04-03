@@ -17,7 +17,6 @@ set :deploy_to, '/srv/paa5'
 set :repository, '/vagrant/'
 set :branch, 'master'
 set :rbenv_path, '/usr/local/rbenv'
-set :bundle_bin, '/usr/local/rbenv/shims/bundle' # FIXME: shouldn't have to
 
 # Manually create these paths in shared/ (eg: shared/config/database.yml) in your server.
 # They will be linked in the 'deploy:link_shared_paths' step.
@@ -32,6 +31,7 @@ set :shared_paths, ['config/database.yml', 'config/config.yml', 'log']
 task :environment do
   # If you're using rbenv, use this to load the rbenv environment.
   # Be sure to commit your .rbenv-version to your repository.
+  queue %{export RBENV_ROOT=#{rbenv_path}} # for system-wide install
   invoke :'rbenv:load'
 
   # For those using RVM, use this to load an RVM version@gemset.
@@ -49,7 +49,9 @@ task :setup => :environment do
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/shared/config"]
 
   queue! %[touch "#{deploy_to}/shared/config/database.yml"]
-  #queue  %[-----> Be sure to edit 'shared/config/database.yml'.]
+  queue  %[echo "-----> Be sure to edit 'shared/config/database.yml'."]
+  queue! %[touch "#{deploy_to}/shared/config/config.yml"]
+  queue  %[echo "-----> Be sure to edit 'shared/config/config.yml'."]
 end
 
 desc "Deploys the current version to the server."
@@ -65,13 +67,15 @@ task :deploy => :environment do
     invoke :'foreman:export'
 
     to :launch do
-      queue 'sudo bluepill restart nginx'
-      invoke 'foreman:restart' # FIXME: needs some logic for when not already started
+      queue "sudo bluepill load /etc/bluepill/#{foreman_app}.pill"
+      # TODO: link the app.pill to an init.d script like chef does for nginx
+      queue 'sudo bluepill nginx restart'
+      invoke 'foreman:restart'
     end
   end
 end
 
-set_default :foreman_app,  lambda { application }
+set_default :foreman_app,  lambda { deploy_to.split('/').last }
 set_default :foreman_user, lambda { user }
 set_default :foreman_log,  lambda { "#{deploy_to!}/#{shared_path}/log" }
 
@@ -90,7 +94,7 @@ namespace :foreman do
   task :start do
     queue %{
       echo "-----> Starting #{foreman_app} services"
-      #{echo_cmd %[sudo "bluepill start #{foreman_app}"]}
+      #{echo_cmd %[sudo bluepill #{foreman_app} start]}
     }
   end
 
@@ -98,7 +102,7 @@ namespace :foreman do
   task :stop do
     queue %{
       echo "-----> Stopping #{foreman_app} services"
-      #{echo_cmd %[sudo "bluepill stop #{foreman_app}"]}
+      #{echo_cmd %[sudo bluepill #{foreman_app} stop]}
     }
   end
 
@@ -106,7 +110,10 @@ namespace :foreman do
   task :restart do
     queue %{
       echo "-----> Restarting #{foreman_app} services"
-      #{echo_cmd %[sudo bluepill restart #{foreman_app}]}
+      # No-ops if not started
+      #{echo_cmd %[sudo bluepill #{foreman_app} restart]}
+      # No-ops if already running
+      #{echo_cmd %[sudo bluepill #{foreman_app} start]}
     }
   end
 end
