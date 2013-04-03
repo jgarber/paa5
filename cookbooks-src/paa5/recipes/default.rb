@@ -25,7 +25,6 @@ include_recipe "rbenv::vagrant"
 
 rbenv_global node['paa5']['ruby_version']
 rbenv_gem "bundler"
-rbenv_gem "rake"
 rbenv_gem "bluepill"
 
 node['nginx']['init_style'] = "bluepill"
