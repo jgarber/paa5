@@ -80,9 +80,14 @@ set_default :foreman_user, lambda { user }
 set_default :foreman_log,  lambda { "#{deploy_to!}/#{shared_path}/log" }
 
 namespace :foreman do
+  desc 'Export the .env file'
+  task :env do
+    queue! "echo 'RAILS_ENV=production' > #{deploy_to!}/#{shared_path}/.env"
+  end
+
   desc 'Export the Procfile to Bluepill scripts'
-  task :export do
-    export_cmd = "sudo #{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log}"
+  task :export => :env do
+    export_cmd = "sudo #{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log} -e #{deploy_to!}/#{shared_path}/.env"
 
     queue %{
       echo "-----> Exporting foreman procfile for #{foreman_app}"
