@@ -9,6 +9,7 @@ development:
 
 test:
   <<: *defaults
+  apps_directory: ./tmp/test/apps
 
 production:
   repos_path: /home/git/repositories
