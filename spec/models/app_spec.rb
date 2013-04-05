@@ -7,6 +7,12 @@ describe App do
       create(:app)
     end
 
+    it "create the app database" do
+      name = "app_with_database"
+      App.any_instance.should_receive(:system).with("DATABASE_URL=postgres://localhost/#{name} rake db:create")
+      create(:app, name: name)
+    end
+
     it "creates the nginx site config" do
       nginx_dir = APP_CONFIG['nginx_config_directory']
       site_available = File.join(nginx_dir, 'sites-available', 'foo')

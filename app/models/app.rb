@@ -2,11 +2,12 @@ class App < ActiveRecord::Base
   attr_accessible :domains, :name, :key_ids
   attr_readonly :name
 
-  validates :name, uniqueness: true, format: {with: /^[a-z0-9-]+$/i, message: "Must be a valid git repo name" }
+  validates :name, uniqueness: true, format: {with: /^[a-z0-9_-]+$/i, message: "Must be a valid git repo name" }
   has_and_belongs_to_many :keys
 
   after_create do
     GitShell.new(name).create_app
+    create_database
     create_nginx_site
   end
 
@@ -30,6 +31,10 @@ class App < ActiveRecord::Base
     end
     File.chmod(0644, outfile)
     FileUtils.ln_s(outfile, File.join(sites_enabled, name), force: true)
+  end
+
+  def create_database
+    system("DATABASE_URL=postgres://localhost/#{name} rake db:create")
   end
 
   private
