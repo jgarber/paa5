@@ -1,4 +1,5 @@
 class GitShell
+  include Paths
   ALLOWED_COMMANDS = %w(git-upload-pack git-receive-pack git-upload-archive)
   attr_reader :name
 
@@ -57,13 +58,5 @@ class GitShell
     Dir.chdir(app_path) do
       FileUtils.mkdir_p(%w(logs build releases shared))
     end
-  end
-
-  def repo_path
-    File.join(APP_CONFIG['repos_path'], name + '.git')
-  end
-
-  def app_path
-    File.join(APP_CONFIG['apps_directory'], name)
   end
 end

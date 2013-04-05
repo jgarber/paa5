@@ -28,15 +28,13 @@ describe App do
   end
 
   context "new App" do
-    let(:app) { create(:app) }
-
     describe :name do
       it "is required" do
         build(:app, name: '').should_not be_valid
       end
 
       it "should be unique" do
-        build(:app, name: app.name).should_not be_valid
+        build(:app, name: subject.name).should_not be_valid
       end
 
       it "should not contain spaces" do
@@ -44,27 +42,27 @@ describe App do
       end
 
       it "should not be renameable" do
-        app.name = "bar"
-        app.update_attributes(name: "bar")
-        app.name.should_not == "bar"
+        subject.name = "bar"
+        subject.update_attributes(name: "bar")
+        subject.name.should_not == "bar"
       end
     end
 
     it "should be valid without domains" do
-      app.domains = ""
-      app.should be_valid
+      subject.domains = ""
+      subject.should be_valid
     end
 
     it "should not have a push URL" do
-      app.push_url.should == "Add a public key to push to this repository"
+      subject.push_url.should == "Add a public key to push to this repository"
     end
   end
 
   context "with one or more keys" do
-    let(:app) { create(:app_with_key) }
+    subject { create(:app_with_key) }
 
     it "should have a push URL" do
-      app.push_url.should match(app.name)
+      subject.push_url.should match(subject.name)
     end
   end
 

@@ -1,7 +1,9 @@
 require "foreman/env"
 
 class App < ActiveRecord::Base
+  include Paths
   attr_accessible :domains, :name, :key_ids
+  attr_reader :env
 
   validates :name, uniqueness: true, format: {with: /^[a-z0-9_-]+$/i, message: "Must be a valid git repo name" }
   has_and_belongs_to_many :keys
@@ -12,6 +14,7 @@ class App < ActiveRecord::Base
     create_nginx_site
   end
   after_save :write_app_env
+  after_initialize :load_app_env
 
   def push_url
     if keys.any?
@@ -25,19 +28,8 @@ class App < ActiveRecord::Base
     super if name.nil? # Write once
   end
 
-  def env
-    @env ||= begin
-      env = default_env
-      Foreman::Env.new(app_env_path).entries do |name, value|
-        env[name] = value
-      end if File.exists?(app_env_path)
-      env
-    end
-  end
-
   def database_url
-    return env["DATABASE_URL"] if @env
-    "postgres://localhost/#{name}"
+    env["DATABASE_URL"]
   end
 
   def create_nginx_site
@@ -59,7 +51,7 @@ class App < ActiveRecord::Base
   end
 
   def reload(*)
-    @env = nil
+    load_app_env
     super
   end
 
@@ -71,9 +63,16 @@ class App < ActiveRecord::Base
         hash['RACK_ENV']
       else
         { 'RACK_ENV' => 'production',
-        'DATABASE_URL' => database_url }[key]
+        'DATABASE_URL' => "postgres://localhost/#{name}" }[key]
       end
     end
+  end
+
+  def load_app_env
+    @env = default_env
+    Foreman::Env.new(app_env_path).entries do |name, value|
+      env[name] = value
+    end if name && File.exists?(app_env_path)
   end
 
   def write_app_env
@@ -84,28 +83,8 @@ class App < ActiveRecord::Base
     (domains || '').split("\n")
   end
 
-  def apps_directory
-    APP_CONFIG['apps_directory']
-  end
-
-  def app_env_path
-    File.join(apps_directory, name, 'shared', '.env')
-  end
-
-  def sites_available
-    File.join(nginx_config_dir, 'sites-available')
-  end
-
-  def sites_enabled
-    File.join(nginx_config_dir, 'sites-enabled')
-  end
-
   def nginx_site_template
     template = File.join(Rails.root, 'lib/templates/nginx_site.erb')
     File.new(template).read
-  end
-
-  def nginx_config_dir
-    APP_CONFIG['nginx_config_directory']
   end
 end
