@@ -1,6 +1,7 @@
+require "foreman/env"
+
 class App < ActiveRecord::Base
   attr_accessible :domains, :name, :key_ids
-  attr_readonly :name
 
   validates :name, uniqueness: true, format: {with: /^[a-z0-9_-]+$/i, message: "Must be a valid git repo name" }
   has_and_belongs_to_many :keys
@@ -10,6 +11,7 @@ class App < ActiveRecord::Base
     create_database
     create_nginx_site
   end
+  after_save :write_app_env
 
   def push_url
     if keys.any?
@@ -19,7 +21,22 @@ class App < ActiveRecord::Base
     end
   end
 
+  def name=(*)
+    super if name.nil? # Write once
+  end
+
+  def env
+    @env ||= begin
+      env = default_env
+      Foreman::Env.new(app_env_path).entries do |name, value|
+        env[name] = value
+      end if File.exists?(app_env_path)
+      env
+    end
+  end
+
   def database_url
+    return env["DATABASE_URL"] if @env
     "postgres://localhost/#{name}"
   end
 
@@ -41,7 +58,27 @@ class App < ActiveRecord::Base
     system("DATABASE_URL=#{database_url} rake db:create")
   end
 
+  def reload(*)
+    @env = nil
+    super
+  end
+
   private
+  def default_env
+    Hash.new do |hash,key|
+      case key
+      when 'RAILS_ENV'
+        hash['RACK_ENV']
+      else
+        { 'RACK_ENV' => 'production',
+        'DATABASE_URL' => database_url }[key]
+      end
+    end
+  end
+
+  def write_app_env
+    File.write(app_env_path, env.map {|k,v| "#{k}=#{v}\n" }.join)
+  end
 
   def nginx_server_names
     (domains || '').split("\n")
@@ -49,6 +86,10 @@ class App < ActiveRecord::Base
 
   def apps_directory
     APP_CONFIG['apps_directory']
+  end
+
+  def app_env_path
+    File.join(apps_directory, name, 'shared', '.env')
   end
 
   def sites_available

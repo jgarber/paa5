@@ -55,7 +55,7 @@ class GitShell
   def create_app_directory
     FileUtils.mkdir_p(app_path, mode: 0770)
     Dir.chdir(app_path) do
-      FileUtils.mkdir_p(%w(logs build releases))
+      FileUtils.mkdir_p(%w(logs build releases shared))
     end
   end
 

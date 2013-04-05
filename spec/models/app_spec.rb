@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe App do
+  subject { create(:app) }
+
   describe "create app" do
     it "creates the repository" do
       GitShell.any_instance.should_receive(:create_app)
@@ -43,8 +45,8 @@ describe App do
 
       it "should not be renameable" do
         app.name = "bar"
-        app.save
-        app.reload.name.should_not == "bar"
+        app.update_attributes(name: "bar")
+        app.name.should_not == "bar"
       end
     end
 
@@ -63,6 +65,32 @@ describe App do
 
     it "should have a push URL" do
       app.push_url.should match(app.name)
+    end
+  end
+
+  describe "environment variables" do
+    it "should have a default set of config vars" do
+      subject.env['DATABASE_URL'].should_not be_nil
+      subject.env['RACK_ENV'].should_not be_nil
+    end
+
+    it "should mirror RACK_ENV to RAILS_ENV" do
+      subject.env['RAILS_ENV'].should == subject.env['RACK_ENV']
+    end
+
+    it "should save env" do
+      subject.env['FOO_BAR'] = 'foo bar'
+      subject.save
+      subject.env['FOO_BAR'] = nil # not saved
+      subject.reload.env['FOO_BAR'].should == 'foo bar'
+    end
+  end
+
+  describe "database_url" do
+    it "should mirror the environment variable" do
+      new_url = "something different"
+      subject.env['DATABASE_URL'] = new_url
+      subject.database_url.should == new_url
     end
   end
 end

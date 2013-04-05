@@ -81,13 +81,8 @@ task :deploy => :environment do
 end
 
 namespace :foreman do
-  desc 'Export the .env file'
-  task :env do
-    queue! "echo 'RAILS_ENV=production' > #{deploy_to!}/#{shared_path}/.env"
-  end
-
   desc 'Export the Procfile to Bluepill scripts'
-  task :export => :env do
+  task :export => :environment do
     export_cmd = "sudo #{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log} -e #{deploy_to!}/#{shared_path}/.env"
 
     queue %{
