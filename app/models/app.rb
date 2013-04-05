@@ -19,6 +19,10 @@ class App < ActiveRecord::Base
     end
   end
 
+  def database_url
+    "postgres://localhost/#{name}"
+  end
+
   def create_nginx_site
     FileUtils.mkdir_p(sites_available, mode: 0755)
     FileUtils.mkdir_p(sites_enabled, mode: 0755)
@@ -34,7 +38,7 @@ class App < ActiveRecord::Base
   end
 
   def create_database
-    system("DATABASE_URL=postgres://localhost/#{name} rake db:create")
+    system("DATABASE_URL=#{database_url} rake db:create")
   end
 
   private
