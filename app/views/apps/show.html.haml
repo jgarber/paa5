@@ -6,6 +6,12 @@
 %p
   %b Domains:
   = @app.domains
+
+%p
+  %b Environment Variables:
+  %ul
+  - @app.env.each do |k,v|
+    %li= "#{k}: #{v}"
 %p
   %b Authorized Keys:
   %ul
