@@ -1,8 +1,8 @@
 GIT
   remote: git://github.com/puma/puma.git
-  revision: 2e2440024623e91bc4f3eb9052b27164627a60f3
+  revision: 444c3c7dd74e0fea72bbd8bf849382187061864f
   specs:
-    puma (2.0.0.b6)
+    puma (2.0.0.b7)
       rack (>= 1.1, < 2.0)
 
 GEM
@@ -160,7 +160,7 @@ DEPENDENCIES
   mina
   pg
   pry
-  puma (~> 2.0.0.b6)!
+  puma!
   rails (~> 3.2.12)
   rspec-rails (~> 2.0)
   sass-rails (~> 3.2.3)
