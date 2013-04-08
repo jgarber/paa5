@@ -1,8 +1,8 @@
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
-require 'mina/rbenv'    # for rbenv support. (http://rbenv.org)
-# require 'mina/rvm'    # for rvm support. (http://rvm.io)
+# require 'mina/rbenv'    # for rbenv support. (http://rbenv.org)
+require 'mina/rvm'    # for rvm support. (http://rvm.io)
 
 # Basic settings:
 #   domain       - The hostname to SSH to.
@@ -16,7 +16,7 @@ set :port, '22'
 set :deploy_to, '/srv/paa5'
 set :repository, '/vagrant/'
 set :branch, 'master'
-set :rbenv_path, '/usr/local/rbenv'
+set :rvm_path, '/usr/local/rvm/bin/rvm'
 
 # Manually create these paths in shared/ (eg: shared/config/database.yml) in your server.
 # They will be linked in the 'deploy:link_shared_paths' step.
@@ -36,11 +36,11 @@ set_default :bluepill_bin, "`readlink -f /etc/init.d/nginx`"
 task :environment do
   # If you're using rbenv, use this to load the rbenv environment.
   # Be sure to commit your .rbenv-version to your repository.
-  queue %{export RBENV_ROOT=#{rbenv_path}} # for system-wide install
-  invoke :'rbenv:load'
+  # queue %{export RBENV_ROOT=#{rbenv_path}} # for system-wide install
+  # invoke :'rbenv:load'
 
   # For those using RVM, use this to load an RVM version@gemset.
-  # invoke :'rvm:use[ruby-1.9.3-p125@default]'
+  invoke :'rvm:use[ruby-1.9.3-p392]'
 end
 
 # Put any custom mkdir's in here for when `mina setup` is ran.
