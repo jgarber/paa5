@@ -11,18 +11,19 @@ class Chef::Recipe
     include Chef::RubyBuild::RecipeHelpers
 end
 
+include_recipe "rvm::gem_package"
+
+node['rvm']['default_ruby'] = node['paa5']['ruby_version']
+node['rvm']['gem_package']['rvm_string'] = node['paa5']['ruby_version']
+
 include_recipe "apt"
 package "build-essential"
-include_recipe "ruby_build"
 include_recipe "nodejs"
 include_recipe "database::postgresql"
 include_recipe "postgresql::server"
 
-node['rvm']['default_ruby'] = node['paa5']['ruby_version']
 include_recipe "rvm::system"
 include_recipe "rvm::vagrant"
-node['rvm']['gem_package']['rvm_string'] = node['paa5']['ruby_version']
-include_recipe "rvm::gem_package"
 
 rvm_gem "bundler"
 rvm_gem "bluepill"

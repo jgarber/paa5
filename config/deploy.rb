@@ -21,7 +21,7 @@ set :rvm_path, '/usr/local/rvm/bin/rvm'
 
 # Manually create these paths in shared/ (eg: shared/config/database.yml) in your server.
 # They will be linked in the 'deploy:link_shared_paths' step.
-set :shared_paths, ['config/database.yml', 'log']
+set :shared_paths, ['config/database.yml', 'log', '.env']
 
 # Optional settings:
 #   set :user, 'foobar'    # Username in the server to SSH to.
@@ -56,6 +56,8 @@ task :setup => :environment do
 
   db_yaml = {"production"=>{"adapter"=>"postgresql", "encoding"=>"unicode", "host"=>"localhost", "database"=>"#{foreman_app}_production", "pool"=>5, "username"=>"paa5", "password"=>"paa5"}}.to_yaml
   queue  %[echo #{Shellwords.escape(db_yaml)} > #{deploy_to}/shared/config/database.yml]
+
+  queue! %[touch "#{deploy_to}/shared/.env"]
 end
 
 desc "Deploys the current version to the server."
@@ -82,11 +84,11 @@ end
 namespace :foreman do
   desc 'Export the Procfile to Bluepill scripts'
   task :export => :environment do
-    export_cmd = "sudo #{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log} -e #{deploy_to!}/#{shared_path}/.env"
+    export_cmd = "#{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log} -e #{deploy_to!}/#{shared_path}/.env"
 
     queue %{
       echo "-----> Exporting foreman procfile for #{foreman_app}"
-      #{echo_cmd %[cd #{deploy_to!}/#{current_path!} ; #{export_cmd}]}
+      #{echo_cmd export_cmd}
     }
   end
 
