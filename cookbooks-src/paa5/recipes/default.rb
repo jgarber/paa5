@@ -11,8 +11,6 @@ class Chef::Recipe
     include Chef::RubyBuild::RecipeHelpers
 end
 
-node['rbenv']['rubies'] = [ node['paa5']['ruby_version'] ]
-
 include_recipe "apt"
 package "build-essential"
 include_recipe "ruby_build"
@@ -20,12 +18,15 @@ include_recipe "nodejs"
 include_recipe "database::postgresql"
 include_recipe "postgresql::server"
 
-include_recipe "rbenv::system"
-include_recipe "rbenv::vagrant"
+node['rvm']['default_ruby'] = node['paa5']['ruby_version']
+include_recipe "rvm::system"
+include_recipe "rvm::vagrant"
+node['rvm']['gem_package']['rvm_string'] = node['paa5']['ruby_version']
+include_recipe "rvm::gem_package"
 
-rbenv_global node['paa5']['ruby_version']
-rbenv_gem "bundler"
-
+rvm_gem "bundler"
+rvm_gem "bluepill"
+node["bluepill"]["bin"] = "#{node[:languages][:ruby][:gems_dir]}/bin/bluepill"
 node['nginx']['init_style'] = "bluepill"
 include_recipe "nginx::source"
 
