@@ -3,6 +3,7 @@ require 'mina/rails'
 require 'mina/git'
 # require 'mina/rbenv'    # for rbenv support. (http://rbenv.org)
 require 'mina/rvm'    # for rvm support. (http://rvm.io)
+require 'yaml'
 
 # Basic settings:
 #   domain       - The hostname to SSH to.
@@ -53,10 +54,8 @@ task :setup => :environment do
   queue! %[mkdir -p "#{deploy_to}/shared/config"]
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/shared/config"]
 
-  queue! %[touch "#{deploy_to}/shared/config/database.yml"]
-  queue  %[echo "-----> Be sure to edit 'shared/config/database.yml'."]
-  queue! %[touch "#{deploy_to}/shared/config/config.yml"]
-  queue  %[echo "-----> Be sure to edit 'shared/config/config.yml'."]
+  db_yaml = {"production"=>{"adapter"=>"postgresql", "encoding"=>"unicode", "host"=>"localhost", "database"=>"#{foreman_app}_production", "pool"=>5, "username"=>"paa5", "password"=>"paa5"}}.to_yaml
+  queue  %[echo #{Shellwords.escape(db_yaml)} > #{deploy_to}/shared/config/database.yml]
 end
 
 desc "Deploys the current version to the server."
