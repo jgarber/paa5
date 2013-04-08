@@ -21,7 +21,7 @@ gem "haml", ">= 3.1.6"
 gem "haml-rails", ">= 0.3.4", :group => :development
 gem "bootstrap-sass", ">= 2.0.4.0"
 
-gem "puma", "~> 2.0.0.b6", :github => 'puma/puma'
+gem "puma", :github => 'puma/puma'
 
 gem "mina"
 gem "foreman"
