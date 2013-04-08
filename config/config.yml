@@ -16,4 +16,3 @@ production:
   authkeys_file: /home/git/.ssh/authorized_keys
   apps_directory: /srv
   nginx_config_directory: /etc/nginx
-
