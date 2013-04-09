@@ -40,7 +40,7 @@ SITE
     runit (1.1.2)
       build-essential (>= 0.0.0)
       yum (>= 0.0.0)
-    windows (1.8.4)
+    windows (1.8.6)
       chef_handler (>= 0.0.0)
     xfs (1.1.0)
     yum (2.2.0)
