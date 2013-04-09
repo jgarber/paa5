@@ -21,6 +21,8 @@ capistrano but is extremely fast.
 * Restarts are seamless because it sends Puma and Nginx a USR2 signal.
 * Scale your processes with a Foreman formation (e.g. web=2,worker=3)
 * Manage application configuration with environment variables like Heroku
+* Run migrations and one-off commands or start a console from your local
+machine
 
 ________________________
 
