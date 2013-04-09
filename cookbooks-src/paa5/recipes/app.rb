@@ -63,26 +63,6 @@ directory '/srv' do
   mode 0770
 end
 
-#TODO: Needs a bootstrap .env file
-
-rvm_shell "bootstrap paa5" do
-  environment 'RAILS_ENV' => 'production'
-  cwd '/vagrant/'
-  user 'vagrant'
-  group 'vagrant'
-  ruby_string 'ruby-1.9.3-p392'
-  code <<-EOD
-    bundle install --deployment
-  EOD
-    #bundle install
-    #bundle exec rake db:migrate
-    #bundle exec rake assets:precompile
-  #code <<-EOD
-    #rm -f tmp/pids/server.pid
-    #bundle exec puma -b unix:/tmp/puma.paa5.sock --pidfile tmp/pids/server.pid -e $RAILS_ENV -d
-  #EOD
-end
-
 template "/etc/nginx/sites-enabled/default" do
   owner "root"
   group "root"
