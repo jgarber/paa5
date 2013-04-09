@@ -45,12 +45,6 @@ group "git" do
   append  true
 end
 
-git repo_path do
-  repository '/vagrant/'
-  user 'git'
-  group 'git'
-end
-
 directory '/etc/bluepill' do
   owner 'vagrant'
   group 'git'
