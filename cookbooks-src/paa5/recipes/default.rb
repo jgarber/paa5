@@ -28,6 +28,7 @@ include_recipe "rvm::system"
 
 rvm_gem "bundler"
 rvm_gem "bluepill"
+rvm_gem "foreman"
 node["bluepill"]["bin"] = "#{node[:languages][:ruby][:gems_dir]}/bin/bluepill"
 node['nginx']['init_style'] = "bluepill"
 include_recipe "nginx::source"
