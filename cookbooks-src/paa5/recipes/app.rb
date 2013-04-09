@@ -54,7 +54,7 @@ end
 directory '/srv' do
   owner 'vagrant'
   group 'git'
-  mode 0770
+  mode 0771
 end
 
 template "/etc/nginx/sites-enabled/default" do
