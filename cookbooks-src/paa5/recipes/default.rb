@@ -15,6 +15,7 @@ include_recipe "rvm::gem_package"
 
 node['rvm']['default_ruby'] = node['paa5']['ruby_version']
 node['rvm']['gem_package']['rvm_string'] = node['paa5']['ruby_version']
+node['rvm']['group_users'] = ['vagrant']
 
 include_recipe "apt"
 package "build-essential"
@@ -22,8 +23,8 @@ include_recipe "nodejs"
 include_recipe "database::postgresql"
 include_recipe "postgresql::server"
 
-include_recipe "rvm::system"
 include_recipe "rvm::vagrant"
+include_recipe "rvm::system"
 
 rvm_gem "bundler"
 rvm_gem "bluepill"
