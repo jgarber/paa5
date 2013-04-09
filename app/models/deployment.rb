@@ -2,7 +2,6 @@ class Deployment
   include Paths
   attr_reader :name
 
-  # sudo mkdir -p "/srv/paa5" && sudo chown -R vagrant "/srv/paa5"
   # bash < <(bundle exec mina -S -v setup | head --lines=-1)
   # bash < <(bundle exec mina -S -v deploy | head --lines=-1)
   def initialize(name)
