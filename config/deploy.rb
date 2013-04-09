@@ -57,7 +57,7 @@ task :setup => :environment do
   db_yaml = {"production"=>{"adapter"=>"postgresql", "encoding"=>"unicode", "host"=>"localhost", "database"=>"#{foreman_app}_production", "pool"=>5, "username"=>"paa5", "password"=>"paa5"}}.to_yaml
   queue  %[echo #{Shellwords.escape(db_yaml)} > #{deploy_to}/shared/config/database.yml]
 
-  queue! %[touch "#{deploy_to}/shared/.env"]
+  queue! %[echo "RACK_ENV=production" > #{deploy_to}/shared/.env]
 end
 
 desc "Deploys the current version to the server."
