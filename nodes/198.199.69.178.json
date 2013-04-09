@@ -1,0 +1,14 @@
+{
+  "user": {
+    "name": "root"
+  },
+  "postgresql": {
+    "password": {"postgres":"password"}
+  },
+  "run_list": [
+    "recipe[paa5]"
+  ],
+  "bluepill": {
+    "bin": "/usr/local/rvm/gems/ruby-1.9.3-p392/bin/bluepill"
+  }
+}

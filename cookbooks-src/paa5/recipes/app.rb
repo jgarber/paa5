@@ -41,18 +41,18 @@ directory repo_path do
 end
 
 group "git" do
-  members ["vagrant"]
+  members [node[:user][:name]]
   append  true
 end
 
 directory '/etc/bluepill' do
-  owner 'vagrant'
+  owner node[:user][:name]
   group 'git'
   mode 0770
 end
 
 directory '/srv' do
-  owner 'vagrant'
+  owner node[:user][:name]
   group 'git'
   mode 0771
 end

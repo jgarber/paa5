@@ -41,19 +41,13 @@ Vagrant::Config.run do |config|
   # path, and data_bags path (all relative to this Vagrantfile), and adding
   # some recipes and/or roles.
 
-  config.vm.provision :chef_solo do |chef|
+   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks","cookbooks-src"]
-
-    #chef.log_level = :debug
-
-    chef.add_recipe "paa5"
-
-    chef.json = {
-      :postgresql => {
-        :password => {
-          :postgres => 'password'
-        }
-      }
-    }
+    chef_json = JSON.parse(File.read(File.dirname(__FILE__) + "/node.json"))
+    recipes = chef_json.delete("run_list")
+    recipes.each do |recipe|
+      chef.add_recipe(recipe)
+    end
+    chef.json = chef_json
   end
 end

@@ -1,0 +1,12 @@
+{
+  "user": {
+    "name": "vagrant",
+    "password": "paa5"
+  },
+  "postgresql": {
+    "password": {"postgres":"password"}
+  },
+  "run_list": [
+    "recipe[paa5]"
+  ]
+}

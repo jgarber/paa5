@@ -25,3 +25,7 @@ gem "puma", :github => 'puma/puma'
 
 gem "mina"
 gem "foreman"
+
+gem "knife-solo", :github => "matschaffer/knife-solo"
+gem 'knife-digital_ocean'
+gem 'librarian-chef'
