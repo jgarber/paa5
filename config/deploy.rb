@@ -30,7 +30,7 @@ set :shared_paths, ['config/database.yml', 'log', '.env']
 set_default :foreman_app,  lambda { deploy_to.split('/').last }
 set_default :foreman_user, lambda { user }
 set_default :foreman_log,  lambda { "#{deploy_to!}/#{shared_path}/log" }
-set_default :bluepill_bin, "`readlink -f /etc/init.d/nginx`"
+set_default :bluepill_bin, "#{foreman_app}_bluepill"
 
 # This task is the environment that is loaded for most commands, such as
 # `mina deploy` or `mina rake`.
@@ -73,23 +73,60 @@ task :deploy => :environment do
     invoke :'foreman:export'
 
     to :launch do
-      queue "sudo #{bluepill_bin} load /etc/bluepill/#{foreman_app}.pill"
-      queue "sudo ln -sf #{bluepill_bin} /etc/init.d/#{foreman_app}"
-      queue "sudo #{bluepill_bin} nginx restart"
-      invoke 'foreman:restart'
+      in_directory '/' do # Escape vendored bundle
+        queue "sudo #{bluepill_bin} load /etc/bluepill/#{foreman_app}.pill"
+        queue "sudo ln -sf #{bluepill_bin} /etc/init.d/#{foreman_app}"
+        queue "sudo #{bluepill_bin} nginx restart"
+        invoke 'foreman:restart'
+      end
     end
   end
 end
 
+# ### rvm:wrapper[]
+# Creates a rvm wrapper for a given executable
+#
+# This is usually placed in the `:setup` task.
+#
+#     task ::setup => :environment do
+#       ...
+#       invoke :'rvm:wrapper[ruby-1.9.3-p125@gemset_name,wrapper_name,binary_name]'
+#     end
+#
+task :'rvm:wrapper', :env, :name, :bin do |t,args|
+  unless args[:env] && args[:name] && args[:bin]
+    print_error "Task 'rvm:wrapper' needs an RVM environment name, an wrapper name and the binary name as arguments"
+    print_error "Example: invoke :'rvm:use[ruby-1.9.2@myapp,myapp,unicorn_rails]'"
+    die
+  end
+
+  queue %{
+    echo "-----> creating RVM wrapper '#{args[:name]}_#{args[:bin]}' using '#{args[:env]}'"
+    if [[ ! -s "#{rvm_path}" ]]; then
+      echo "! Ruby Version Manager not found"
+      echo "! If RVM is installed, check your :rvm_path setting."
+      exit 1
+    fi
+
+    source #{rvm_path}
+    #{echo_cmd %{sudo rvm wrapper #{args[:env]} #{args[:name]} #{args[:bin]} }} || exit 1
+  }
+end
+
 namespace :foreman do
   desc 'Export the Procfile to Bluepill scripts'
-  task :export => :environment do
-    export_cmd = "#{bundle_bin} exec foreman export bluepill /etc/bluepill -a #{foreman_app} -u #{foreman_user} -l #{foreman_log} -e #{deploy_to!}/#{shared_path}/.env"
+  task :export => [:environment, :rvm_wrap] do
+    export_cmd = "foreman export bluepill /etc/bluepill -a #{foreman_app} --user #{foreman_user} --log #{foreman_log} --env #{deploy_to!}/#{shared_path}/.env --root=#{deploy_to!}/#{current_path!} --procfile=./Procfile"
 
     queue %{
       echo "-----> Exporting foreman procfile for #{foreman_app}"
       #{echo_cmd export_cmd}
     }
+  end
+
+  desc 'Make an RVM wrapper for bluepill'
+  task :rvm_wrap => :environment do
+    invoke :"rvm:wrapper[ruby-1.9.3-p392,#{foreman_app},`which bluepill`]"
   end
 
   desc "Start the application services"
